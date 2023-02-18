@@ -1,12 +1,11 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class SpaceshipInterior : MonoBehaviour, IGravitator
+public class SpaceshipInterior : MonoBehaviour
 {
-    private Gravitator passenger;
+    private Passenger passenger;
 
     public IGravityField GravityField { get; set; }
-    public Transform Transform => transform;
 
     private void Awake()
     {
@@ -15,7 +14,6 @@ public class SpaceshipInterior : MonoBehaviour, IGravitator
 
     private void OnTriggerEnter(Collider other)
     {
-
         IGravitator gravitator = other.GetComponentInParent<IGravitator>();
         if (gravitator == null || ReferenceEquals(other.gameObject, passenger?.GameObject)) return;
 

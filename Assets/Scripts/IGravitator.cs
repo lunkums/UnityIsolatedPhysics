@@ -7,6 +7,12 @@ public interface IGravitator
     Transform Parent
     {
         get => Transform.parent;
-        set => Transform.parent = value;
+        set
+        {
+            Transform.parent = value;
+            OnParentChanged();
+        }
     }
+
+    void OnParentChanged();
 }

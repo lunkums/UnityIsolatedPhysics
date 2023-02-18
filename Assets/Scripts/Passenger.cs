@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
-public class Gravitator
+public class Passenger
 {
     private IGravitator gravitator;
 
     private Transform originalParent;
     private IGravityField originalGravityField;
 
-    public Gravitator(IGravitator gravitator, IGravityField gravityField)
+    public Passenger(IGravitator gravitator, IGravityField gravityField)
     {
         this.gravitator = gravitator;
 

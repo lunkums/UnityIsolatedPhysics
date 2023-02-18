@@ -80,9 +80,13 @@ public class FpsController : MonoBehaviour, IGravitator
     #endregion
 
     [Header("Orientation")]
-    [SerializeField, Range(0.001f, 1f)] private float orientationSmoothTime = 0.5f;
+    [SerializeField,
+        Tooltip("The rate at which the player orients himself upward; 2 means twice as fast"),
+        Range(0.001f, 2f)]
+    private float orientationRate = 1f;
 
-    private Vector3 orientationVelocity;
+    // Used to interpolate rotations
+    private float timeSinceParentChanged;
 
     #region Fields
     // Caching this always a good practice
@@ -259,8 +263,10 @@ public class FpsController : MonoBehaviour, IGravitator
         //}
 
         // Orientation
-        Quaternion orient = Quaternion.FromToRotation(_transform.up, Gravity.Up);
-        _transform.rotation *= orient;
+        _transform.rotation = Quaternion.Slerp(
+            _transform.rotation,
+            Quaternion.LookRotation(_transform.forward, Gravity.Up),
+            (Time.time - timeSinceParentChanged) * orientationRate);
     }
 
     private void Accelerate(ref Vector3 playerVelocity, Vector3 accelDir, float accelCoeff, float dt)
@@ -439,4 +445,9 @@ public class FpsController : MonoBehaviour, IGravitator
         _velocity = t.TransformDirection(Vector3.forward);
     }
 
+    // Reset the time since the parent was changed; for use in reorienting the player upwards
+    public void OnParentChanged()
+    {
+        timeSinceParentChanged = Time.time;
+    }
 }

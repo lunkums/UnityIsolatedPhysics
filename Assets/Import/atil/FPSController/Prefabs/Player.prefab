@@ -413,7 +413,7 @@ MonoBehaviour:
   _gravityAmount: 24
   _airControlPrecision: 16
   _airControlAdditionForward: 8
-  orientationSmoothTime: 0.5
+  orientationRate: 1
 --- !u!114 &114722541770350444
 MonoBehaviour:
   m_ObjectHideFlags: 0
