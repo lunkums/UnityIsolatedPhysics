@@ -334,7 +334,7 @@ public class FpsController : MonoBehaviour
             Collider envColl = _overlappingColliders[i];
 
             // Skip empty slots
-            if (envColl == null)
+            if (envColl == null || envColl.isTrigger)
             {
                 continue;
             }
