@@ -15,6 +15,8 @@ public class SpaceshipInterior : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        if (passenger == null) return;
+
         Debug.Log("Passenger exited");
         passenger.Disengage();
         passenger = null;
