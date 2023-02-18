@@ -43,13 +43,13 @@ public class Footsteps : MonoBehaviour
 
         if (isLandedThisFrame && !isGonnaJump)
         {
-            _audioSource.PlayOneShot(_landClip);
+            //_audioSource.PlayOneShot(_landClip);
         }
 
         if (isGrounded)
         {
-            _distanceCovered += Vector3.Distance(_prevPos.WithY(0), transform.position.WithY(0));
+            _distanceCovered += Vector3.Distance(_prevPos.WithY(0), transform.localPosition.WithY(0));
         }
-        _prevPos = transform.position;
+        _prevPos = transform.localPosition;
     }
 }

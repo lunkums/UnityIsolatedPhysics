@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Q3-based first person controller
 /// </summary>
-public class FpsController : MonoBehaviour
+public class FpsController : MonoBehaviour, IGravitator
 {
     #region Drag Drop
     [Header("Components")]
@@ -79,6 +79,11 @@ public class FpsController : MonoBehaviour
     private float _airControlAdditionForward = 8f;
     #endregion
 
+    [Header("Orientation")]
+    [SerializeField, Range(0.001f, 1f)] private float orientationSmoothTime = 0.5f;
+
+    private Vector3 orientationVelocity;
+
     #region Fields
     // Caching this always a good practice
     // TODO: Not anymore, as Unity caches it for us.
@@ -104,6 +109,15 @@ public class FpsController : MonoBehaviour
     private Vector3 _wishDirDebug;
     #endregion
 
+    public IGravityField GravityField { get; set; }
+    public Gravity Gravity => GravityField.Gravity;
+    public Transform Transform => _transform;
+
+    private void Awake()
+    {
+        GravityField = WorldGravityField.Instance;
+    }
+
     private void Start()
     {
         Application.targetFrameRate = 60; // My laptop is shitty and burn itself to death if not for this
@@ -126,15 +140,20 @@ public class FpsController : MonoBehaviour
             (Mathf.Round(ups.magnitude * 100) / 100).ToString());
 
         // Draw horizontal speed as a line
-        Vector2 mid = new(Screen.width / 2, Screen.height / 2); // Should remain integer division, otherwise GUI drawing gets screwed up
-        Vector3 v = _camTransform.InverseTransformDirectionHorizontal(_velocity) * (_velocity.WithY(0).magnitude * 10f);
+
+        // Should remain integer division, otherwise GUI drawing gets screwed up
+        Vector2 mid = new(Screen.width / 2, Screen.height / 2); 
+        Vector3 v = _camTransform.InverseTransformDirectionHorizontal(_velocity, Gravity)
+            * (_velocity.WithY(0).magnitude * 10f);
+
         if (v.WithY(0).magnitude > 0.0001)
         {
             GuiDraw.DrawLine(mid, mid + Vector2.up * -v.z + Vector2.right * v.x, Color.red, 3f);
         }
 
         // Draw input direction
-        Vector3 w = _camTransform.InverseTransformDirectionHorizontal(_wishDirDebug) * 100;
+        Vector3 w = _camTransform.InverseTransformDirectionHorizontal(_wishDirDebug, Gravity) * 100;
+
         if (w.magnitude > 0.001)
         {
             GuiDraw.DrawLine(mid, mid + Vector2.up * -w.z + Vector2.right * w.x, Color.blue, 2f);
@@ -166,16 +185,18 @@ public class FpsController : MonoBehaviour
         _transform.rotation *= Quaternion.Euler(Input.GetAxis("Mouse X") * Sensitivity * dt * Vector3.up);
         
         // Reset player -- makes testing much easier
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Gravity.Set(Vector3.down);
-            _transform.position = new Vector3(0, 5, 0);
-            _velocity = Vector3.forward;
-        }
+        //if (Input.GetKeyDown(KeyCode.R))
+        //{
+        //    Gravity.Set(Vector3.down);
+        //    _transform.position = new Vector3(0, 5, 0);
+        //    _velocity = Vector3.forward;
+        //}
 
         // MOVEMENT
-        Vector3 wishDir = _camTransform.TransformDirectionHorizontal(_moveInput); // We want to go in this direction
-        _wishDirDebug = wishDir.ToHorizontal();
+
+        // We want to go in this direction
+        Vector3 wishDir = _camTransform.TransformDirectionHorizontal(_moveInput, Gravity);
+        _wishDirDebug = wishDir.ToHorizontal(Gravity);
 
         bool isGrounded = IsGrounded(out Vector3 groundNormal);
 
@@ -236,6 +257,10 @@ public class FpsController : MonoBehaviour
         //    Gravity.Set(Vector3.right);
         //    _transform.rotation = Quaternion.LookRotation(Gravity.Forward, -Gravity.Down);
         //}
+
+        // Orientation
+        Quaternion orient = Quaternion.FromToRotation(_transform.up, Gravity.Up);
+        _transform.rotation *= orient;
     }
 
     private void Accelerate(ref Vector3 playerVelocity, Vector3 accelDir, float accelCoeff, float dt)
@@ -286,8 +311,8 @@ public class FpsController : MonoBehaviour
     {
         // This only happens in the horizontal plane
         // TODO: Verify that these work with various gravity values
-        Vector3 playerDirHorz = playerVelocity.ToHorizontal().normalized;
-        float playerSpeedHorz = playerVelocity.ToHorizontal().magnitude;
+        Vector3 playerDirHorz = playerVelocity.ToHorizontal(Gravity).normalized;
+        float playerSpeedHorz = playerVelocity.ToHorizontal(Gravity).magnitude;
 
         float dot = Vector3.Dot(playerDirHorz, accelDir);
         if (dot > 0)
@@ -307,7 +332,8 @@ public class FpsController : MonoBehaviour
             playerDirHorz.Normalize();
 
             // Assign new direction, without touching the vertical speed
-            playerVelocity = (playerDirHorz * playerSpeedHorz).ToHorizontal() + Gravity.Up * playerVelocity.VerticalComponent();
+            playerVelocity = (playerDirHorz * playerSpeedHorz).ToHorizontal(Gravity)
+                + Gravity.Up * playerVelocity.VerticalComponent(Gravity);
         }
 
     }

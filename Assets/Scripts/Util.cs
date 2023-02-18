@@ -18,24 +18,24 @@ public static class Util
         return new Vector3(v.x, v.y, z);
     }
 
-    public static Vector3 ToHorizontal(this Vector3 v)
+    public static Vector3 ToHorizontal(this Vector3 v, Gravity gravity)
     {
-        return Vector3.ProjectOnPlane(v, Gravity.Down);
+        return Vector3.ProjectOnPlane(v, gravity.Down);
     }
 
-	public static float VerticalComponent(this Vector3 v)
+	public static float VerticalComponent(this Vector3 v, Gravity gravity)
     {
-        return Vector3.Dot(v, Gravity.Up);
+        return Vector3.Dot(v, gravity.Up);
     }
 	
-    public static Vector3 TransformDirectionHorizontal(this Transform t, Vector3 v)
+    public static Vector3 TransformDirectionHorizontal(this Transform t, Vector3 v, Gravity gravity)
     {
-        return t.TransformDirection(v).ToHorizontal().normalized;
+        return t.TransformDirection(v).ToHorizontal(gravity).normalized;
     }
 
-    public static Vector3 InverseTransformDirectionHorizontal(this Transform t, Vector3 v)
+    public static Vector3 InverseTransformDirectionHorizontal(this Transform t, Vector3 v, Gravity gravity)
     {
-        return t.InverseTransformDirection(v).ToHorizontal().normalized;
+        return t.InverseTransformDirection(v).ToHorizontal(gravity).normalized;
     }
 
     public static void Shuffle<T>(this IList<T> list)

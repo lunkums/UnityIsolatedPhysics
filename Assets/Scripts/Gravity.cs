@@ -1,24 +1,25 @@
 ﻿using UnityEngine;
 
-public static class Gravity
+public class Gravity
 {
-    public static Vector3 Down { get; private set; }
-    public static Vector3 Forward { get; private set; }
-    public static Vector3 Up { get { return -Down; } }
+    private Transform transform;
 
-    static Gravity()
+    public Vector3 Down => -Up;
+    public Vector3 Forward => transform.forward;
+    public Vector3 Up => transform.up;
+
+    public Gravity(Transform transform)
     {
-        Down = Vector3.down;
-        Forward = Vector3.forward;
+        this.transform = transform;
     }
 
-    public static void Set(Vector3 down)
+    public void Set(Vector3 down)
     {
         // Gravity will rotate around this axis with this amount
         Vector3 axis = Vector3.Cross(Down, down);
         float angle = Vector3.Angle(Down, down);
 
-        Down = down;
-        Forward = Quaternion.AngleAxis(angle, axis) * Forward;
+        transform.up = -down;
+        transform.forward = Quaternion.AngleAxis(angle, axis) * Forward;
     }
 }
