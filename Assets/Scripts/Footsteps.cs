@@ -1,55 +1,58 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Footsteps : MonoBehaviour
+namespace Import
 {
-    private const float DistancePerStep = 3f;
-
-    [SerializeField]
-    private AudioSource _audioSource;
-
-    [SerializeField]
-    private AudioClip[] _stepClips;
-
-    [SerializeField]
-    private AudioClip _jumpClip;
-
-    [SerializeField]
-    private AudioClip _landClip;
-
-    private List<AudioClip> _shuffledClips;
-    private Vector3 _prevPos;
-    private float _distanceCovered;
-
-    private void Start()
+    public class Footsteps : MonoBehaviour
     {
-        _shuffledClips = new List<AudioClip>(_stepClips);
-    }
+        private const float DistancePerStep = 3f;
 
-    public void ExternalUpdate(bool isGonnaJump, bool isGrounded, bool isLandedThisFrame)
-    {
-        if (_distanceCovered > DistancePerStep)
+        [SerializeField]
+        private AudioSource _audioSource;
+
+        [SerializeField]
+        private AudioClip[] _stepClips;
+
+        [SerializeField]
+        private AudioClip _jumpClip;
+
+        [SerializeField]
+        private AudioClip _landClip;
+
+        private List<AudioClip> _shuffledClips;
+        private Vector3 _prevPos;
+        private float _distanceCovered;
+
+        private void Start()
         {
-            _distanceCovered = 0;
-
-            _audioSource.PlayOneShot(_shuffledClips[0]);
-            _shuffledClips.Shuffle();
+            _shuffledClips = new List<AudioClip>(_stepClips);
         }
 
-        if (isGonnaJump && isGrounded)
+        public void ExternalUpdate(bool isGonnaJump, bool isGrounded, bool isLandedThisFrame)
         {
-            _audioSource.PlayOneShot(_jumpClip);
-        }
+            if (_distanceCovered > DistancePerStep)
+            {
+                _distanceCovered = 0;
 
-        if (isLandedThisFrame && !isGonnaJump)
-        {
-            //_audioSource.PlayOneShot(_landClip);
-        }
+                _audioSource.PlayOneShot(_shuffledClips[0]);
+                _shuffledClips.Shuffle();
+            }
 
-        if (isGrounded)
-        {
-            _distanceCovered += Vector3.Distance(_prevPos.WithY(0), transform.localPosition.WithY(0));
+            if (isGonnaJump && isGrounded)
+            {
+                _audioSource.PlayOneShot(_jumpClip);
+            }
+
+            if (isLandedThisFrame && !isGonnaJump)
+            {
+                //_audioSource.PlayOneShot(_landClip);
+            }
+
+            if (isGrounded)
+            {
+                _distanceCovered += Vector3.Distance(_prevPos.WithY(0), transform.localPosition.WithY(0));
+            }
+            _prevPos = transform.localPosition;
         }
-        _prevPos = transform.localPosition;
     }
 }

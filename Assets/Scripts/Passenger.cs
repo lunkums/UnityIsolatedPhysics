@@ -1,28 +1,45 @@
 ﻿using UnityEngine;
 
-public class Passenger
+namespace IsolatedPhysics
 {
-    private IGravitator gravitator;
-
-    private Transform originalParent;
-    private IGravityField originalGravityField;
-
-    public Passenger(IGravitator gravitator, IGravityField gravityField)
+    /// <summary>
+    /// A passenger of a <see cref="SpaceshipInterior"/>.
+    /// </summary>
+    public class Passenger
     {
-        this.gravitator = gravitator;
+        private IGravitator gravitator;
 
-        originalParent = gravitator.Parent;
-        gravitator.Parent = gravityField.Transform;
+        private Transform originalParent;
+        private IGravityField originalGravityField;
 
-        originalGravityField = gravitator.GravityField;
-        gravitator.GravityField = gravityField;
-    }
+        /// <summary>
+        /// Construct a passenger, overriding his parent transform and gravity.
+        /// </summary>
+        /// <param name="gravitator">The gravitator component of the passenger.</param>
+        /// <param name="gravityField">The gravity field to override the passenger's existing gravity with.</param>
+        public Passenger(IGravitator gravitator, IGravityField gravityField)
+        {
+            this.gravitator = gravitator;
 
-    public GameObject GameObject { get; set; }
+            originalParent = gravitator.Parent;
+            gravitator.Parent = gravityField.Transform;
 
-    public void Disengage()
-    {
-        gravitator.Parent = originalParent;
-        gravitator.GravityField = originalGravityField;
+            originalGravityField = gravitator.GravityField;
+            gravitator.GravityField = gravityField;
+        }
+
+        /// <summary>
+        /// The game object associated with the passenger.
+        /// </summary>
+        public GameObject GameObject { get; set; }
+
+        /// <summary>
+        /// Disengage from the overriding gravity field and return the passenger to his original parent and gravity.
+        /// </summary>
+        public void Disengage()
+        {
+            gravitator.Parent = originalParent;
+            gravitator.GravityField = originalGravityField;
+        }
     }
 }

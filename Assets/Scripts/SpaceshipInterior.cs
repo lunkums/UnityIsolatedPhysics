@@ -1,35 +1,50 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
-public class SpaceshipInterior : MonoBehaviour
+namespace IsolatedPhysics
 {
-    private Passenger passenger;
-
-    public IGravityField GravityField { get; set; }
-
-    private void Awake()
+    /// <summary>
+    /// The interior of a spaceship, including its passengers.
+    /// </summary>
+    [RequireComponent(typeof(Collider))]
+    public class SpaceshipInterior : MonoBehaviour
     {
-        GravityField = GetComponentInChildren<GravityField>();
-    }
+        private Passenger passenger;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        IGravitator gravitator = other.GetComponentInParent<IGravitator>();
-        if (gravitator == null || ReferenceEquals(other.gameObject, passenger?.GameObject)) return;
+        /// <summary>
+        /// The field of gravity to which the passengers are attracted.
+        /// </summary>
+        public IGravityField GravityField { get; set; }
 
-        Debug.Log("New passenger entered");
-        passenger = new(gravitator, GravityField)
+        private void Awake()
         {
-            GameObject = other.gameObject
-        };
-    }
+            GravityField = GetComponentInChildren<GravityField>();
+        }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (passenger == null || !ReferenceEquals(other.gameObject, passenger?.GameObject)) return;
+        /**
+         * If there is a new passenger, add him and override his gravity.
+         */
+        private void OnTriggerEnter(Collider other)
+        {
+            IGravitator gravitator = other.GetComponentInParent<IGravitator>();
+            if (gravitator == null || ReferenceEquals(other.gameObject, passenger?.GameObject)) return;
 
-        Debug.Log("Passenger exited");
-        passenger.Disengage();
-        passenger = null;
+            Debug.Log("New passenger entered");
+            passenger = new(gravitator, GravityField)
+            {
+                GameObject = other.gameObject
+            };
+        }
+
+        /**
+         * If an existing passenger is leaving, disengage him from the gravity field.
+         */
+        private void OnTriggerExit(Collider other)
+        {
+            if (passenger == null || !ReferenceEquals(other.gameObject, passenger?.GameObject)) return;
+
+            Debug.Log("Passenger exited");
+            passenger.Disengage();
+            passenger = null;
+        }
     }
 }

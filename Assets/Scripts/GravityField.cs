@@ -1,14 +1,23 @@
 ﻿using UnityEngine;
 
-public class GravityField : MonoBehaviour, IGravityField
+namespace IsolatedPhysics
 {
-    private Gravity gravity;
-
-    public Gravity Gravity => gravity;
-    public Transform Transform => transform.parent.parent;
-
-    private void Awake()
+    /// <summary>
+    /// A MonoBehaviour implementation of a <see cref="IGravityField">IGravityField</see>.
+    /// </summary>
+    public class GravityField : MonoBehaviour, IGravityField
     {
-        gravity = new(transform);
+        [SerializeField] private Transform root;
+
+        private Gravity gravity;
+
+        public Gravity Gravity => gravity;
+
+        public Transform Transform => root;
+
+        private void Awake()
+        {
+            gravity = new(transform);
+        }
     }
 }
