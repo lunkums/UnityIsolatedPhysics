@@ -120,15 +120,11 @@ namespace Import
         public Gravity Gravity => GravityField.Gravity;
         public Transform Transform => _transform;
 
-        private void Awake()
-        {
-            GravityField = WorldGravityField.Instance;
-        }
-
         private void Start()
         {
             Application.targetFrameRate = 165; // My laptop is shitty and burn itself to death if not for this
             QualitySettings.vSyncCount = 2;
+            GravityField = WorldGravityField.Instance;
             _transform = transform;
             _ghostJumpRayPosition = _groundedRayPositions[_groundedRayPositions.Count - 1];
         }
